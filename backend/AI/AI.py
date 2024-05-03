@@ -12,6 +12,8 @@ try:
   def detect_vehicles(image_path):
     script_dir = os.path.dirname(__file__)
     image_path = os.path.join(script_dir, '../images', image_path)
+    print(script_dir)
+    print(image_path)
 
     image = cv2.imread(image_path)
     
@@ -28,7 +30,9 @@ try:
 
 
   if __name__ == '__main__':
+    print("inside AI")
     image_path = sys.argv[1]
+    print(image_path)
     vehicle_count = detect_vehicles(image_path)
     print(json.dumps({'vehicle_count': vehicle_count}))
 except Exception as e:
