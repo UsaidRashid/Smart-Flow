@@ -6,9 +6,26 @@ import Counter from './Components/Counter';
 import axios from 'axios';
 
 export default function App() {
-  const [remainingTime , setRemainingTime ]= useState(20);
+  const [remainingTime , setRemainingTime ]= useState(60);
   const [imageUrls, setImageUrls] = useState([]);
   const [currentSide, setCurrentSide] = useState('north');
+  const [isPaused , setisPaused] = useState(false);
+  const [stackedside , setStackedSide] = useState(null);
+
+  function getNextSide(currentSide) {
+    switch (currentSide) {
+      case 'north':
+        return 'east';
+      case 'east':
+        return 'south';
+      case 'south':
+        return 'west';
+      case 'west':
+        return 'north';
+      default:
+        return 'north'; 
+    }
+  }
 
   const checkCapturedImage = async () => {
     if (!imageUrls || imageUrls.length === 0) {
@@ -31,30 +48,19 @@ export default function App() {
 
     const currentSideImage = imageUrls[sideIndexMap[currentSide]];
     if (currentSideImage && currentSideImage.includes('empty')) {
-      const restIndexes = [{}];
+      setisPaused(true);
+      setStackedSide(getNextSide(currentSide));
+      const restIndexes = [];
       for(let i=0;i<=3;i++){
         if(sideIndexMap[currentSide]!=i) restIndexes.push({image:imageUrls[i],side:sideMap[i]});
       }
       const response = await axios.post('http://localhost:3005/processimages' , restIndexes);
-      console.log(response);
-      setCurrentSide(response.side);
+      setCurrentSide(response.data.resultSide);
+      setisPaused(false);
     }
   };
 
-  function getNextSide(currentSide) {
-    switch (currentSide) {
-      case 'north':
-        return 'east';
-      case 'east':
-        return 'south';
-      case 'south':
-        return 'west';
-      case 'west':
-        return 'north';
-      default:
-        return 'north'; 
-    }
-  }
+  
 
   const fetchImageUrls = async () => {
     try {
@@ -78,12 +84,15 @@ export default function App() {
   useEffect(() => {
     const intervalId = setInterval(() => {
      
-      if(remainingTime>0){
+      if(!isPaused && remainingTime>0){
         setRemainingTime(remainingTime-1);
-      }else{
-        const nextSide = getNextSide(currentSide);
-        setCurrentSide(nextSide);
-        setRemainingTime(20);
+      }else if(remainingTime===0){
+        if(stackedside!=null){
+          setCurrentSide(stackedside);
+          setStackedSide(null);
+        }
+        else setCurrentSide(getNextSide(currentSide));
+        setRemainingTime(60);
       }
     }, 1000); 
   
@@ -92,9 +101,8 @@ export default function App() {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (remainingTime %10===0 && remainingTime>=10 ) {
-        fetchImageUrls();
-        
+      if (remainingTime %10===0 && remainingTime>10) {
+        if(remainingTime==60 || stackedside==null) fetchImageUrls();
       }
     }, 1000); 
   
@@ -108,12 +116,12 @@ export default function App() {
                 <DropImage
                   side="north"
                   image={`./public/assets/${imageUrls[0]}`}
-                  
                 />
+                {console.log(imageUrls)}
                 <div className='flex justify-center'>
                     {currentSide!="north"? <img src={`./public/assets/images/stop.png`} alt="" className=' w-1/2 h-20 ' />:<img src={`./public/assets/images/go.png`} alt="" className=' w-1/2 h-20 ' />}
                 </div>
-              { currentSide=="north" && <Counter remainingTime={remainingTime} />} 
+              
      </div>
       <div className='absolute top-[7rem] left-[22rem]'>
               <DropImage
@@ -125,7 +133,10 @@ export default function App() {
               <div className='flex justify-center'>
               {currentSide!="west"? <img src={`./public/assets/images/stop.png`} alt="" className=' w-1/2 h-20 ' />:<img src={`./public/assets/images/go.png`} alt="" className=' w-1/2 h-20 ' />}
               </div>
-              {currentSide=="west" && <Counter remainingTime={remainingTime} />}
+              
+     </div>
+     <div className='absolute top-[23rem] left-[42rem] bg-gray-200 opacity-30'>
+          <Counter remainingTime={remainingTime}></Counter>
      </div>
       <div className='absolute top-[29rem] left-[22rem]'>
                 <DropImage
@@ -136,7 +147,7 @@ export default function App() {
                 <div className='flex justify-center'>
                 {currentSide!="south"? <img src={`./public/assets/images/stop.png`} alt="" className=' w-1/2 h-20 ' />:<img src={`./public/assets/images/go.png`} alt="" className=' w-1/2 h-20 ' />}
               </div>
-              {currentSide=="south" && <Counter remainingTime={remainingTime} />}
+              
      </div>
       <div className='absolute top-[29rem] right-[25rem]'>
                 <DropImage
@@ -147,7 +158,7 @@ export default function App() {
               <div className='flex justify-center'>
               {currentSide!="east"? <img src={`./public/assets/images/stop.png`} alt="" className=' w-1/2 h-20 ' />:<img src={`./public/assets/images/go.png`} alt="" className=' w-1/2 h-20 ' />}
               </div>
-              {currentSide=="east" && <Counter remainingTime={remainingTime} />}
+ 
       </div>
     </>
   )

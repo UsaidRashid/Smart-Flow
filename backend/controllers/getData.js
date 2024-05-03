@@ -4,7 +4,6 @@ const path = require('path');
 async function callAI(imagePath) {
     return new Promise((resolve, reject) => {
       const scriptPath = path.join(__dirname, '../AI/AI.py');
-      console.log("callai",imagePath);
       const pythonProcess = spawn('python', [scriptPath, imagePath]);
   
       let outputData = '';
@@ -59,13 +58,13 @@ module.exports.processimages = async (req , res) =>{
 
         for (const imagePath of imagePaths) {
             try {
-                const image=imagePath.image.replace(/\\..\\images\\/i,"");
-                const vehicleCount = await callAI(image);
+                const vehicleCount = await callAI(imagePath.image);
                 results.push({vehicleCount : vehicleCount,side : imagePath.side});
               } catch (error) {
                 console.error('Error processing image:', imagePath, error);
               }
         }
+        console.log(results);
 
         let maxi=0;
         let resultSide = "north";
