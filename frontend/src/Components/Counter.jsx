@@ -18,4 +18,4 @@ const Counter = ({ remainingTime }) => {
     );
   };
   
-  export default Counter;
+export default Counter;

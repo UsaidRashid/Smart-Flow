@@ -127,7 +127,6 @@ export default function App() {
               <DropImage
                 side="west"
                 image={`./public/assets/${imageUrls[3]}`}
-                
               />
 
               <div className='flex justify-center'>
