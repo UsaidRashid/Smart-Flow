@@ -7,3 +7,4 @@ router
         .get(setDataController.sendRandomImages);
 
 module.exports=router;
+
