@@ -4,6 +4,7 @@ import DropImage from './Components/DropImage'
 import { useState, useEffect} from 'react';
 import Counter from './Components/Counter';
 import axios from 'axios';
+import Toast from './Components/Toast';
 
 export default function App() {
   const [remainingTime , setRemainingTime ]= useState(60);
@@ -134,8 +135,9 @@ export default function App() {
               </div>
               
      </div>
-     <div className='absolute top-[18rem] left-[43rem]  '>
-          <Counter remainingTime={remainingTime}></Counter>
+      <div className='absolute top-[20rem] left-[48rem]  '>
+        {isPaused?<Toast/>:
+          <Counter remainingTime={remainingTime}></Counter>}
      </div>
       <div className='absolute top-[29rem] left-[22rem]'>
                 <DropImage
