@@ -135,7 +135,7 @@ export default function App() {
               </div>
               
      </div>
-     <div className='absolute top-[23rem] left-[42rem] bg-gray-200 opacity-30'>
+     <div className='absolute top-[20rem] left-[48rem]  '>
           <Counter remainingTime={remainingTime}></Counter>
      </div>
       <div className='absolute top-[29rem] left-[22rem]'>
