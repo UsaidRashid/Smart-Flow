@@ -10,7 +10,7 @@ async function callAI(imagePath) {
   
       pythonProcess.stderr.on('data', (err) => {
         const errString = err.toString();
-        console.log(errString);
+        
         if (!errString.includes('Using cache found in') &&
             !errString.includes('YOLOv5') &&
             !errString.includes('Fusing layers...') &&
@@ -23,7 +23,7 @@ async function callAI(imagePath) {
   
       pythonProcess.stdout.on('data', (data) => {
         outputData += data.toString();
-        console.log(outputData);
+        
       });
 
       pythonProcess.on('close', (code) => {
